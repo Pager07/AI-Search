@@ -1,5 +1,5 @@
 import numpy as np
-file_path = "/Users/sandeep/Desktop/Year 2/SoftwareMethod/CourseWork/NEWAISearchfile012.txt"
+file_path = "/Users/sandeep/Desktop/Year 2/SoftwareMethod/AI-Search/NEWAISearchfile012.txt"
 
 f = open(file_path, "r")
 
@@ -47,6 +47,26 @@ def distance_matrix():
             elif x > y:
                 mat[x,y] = mat[y,x]          
     return mat
+
+
+##finding heuristice values for each node
+#h(x) = distacne to next node(smallest)
+
+def heuristic_values(mat):
+    #i want to get min value for each city/row
+    #but there was zero, becuase there was distacne connected to itslef
+    #so i said if, where valvue is greater than 5, do nothing,elese replace it with max value
+    #then just pick the min
+    #example [0,1,4,6]->[6,1,2,6] and now pick miniimun
+    h_values = np.where(mat>0, mat,mat.max()).min(1)
+    return h_values
+
+
+
+
+
+
+
 
 
    
