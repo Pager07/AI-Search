@@ -63,25 +63,94 @@ def distance_matrix():
 
 mat = distance_matrix()
 G = nx.Graph()
-def initial_state_node(start_city):
-    visited_list = [start_city]
-    pc = 0
+
+def update_visited(current_state_id ,current_city,city):
+    if current_city == city and current_state_id == 1:
+        visited_list = [city]
+    else:
+        visited_list = G.node[current_state_id]['state_info']['visited'][:]
+        visited_list.append(city)
+    return visited_list
+    
+
+def find_heuristic(current_city,city,visited_list):
     min_distance_option = []
-    city_distances = mat[start_city] 
+    city_distances = mat[city] 
     for city , distance in enumerate(city_distances):
         if city not in visited_list:
             min_distance_option.append(city_distances[city])
-    print(min_distance_option)
     h_value = min(min_distance_option)
+    return h_value
+
+def find_path_cost(visited_list):
+    path_cost = 0
+    if len(visited_list) != 1:
+        pointer = 0
+        while pointer < len(visited_list)-1:
+            first_city = visited_list[pointer]
+            second_city = visited_list[pointer+1]
+            first_second_path_cost = mat[first_city][second_city]
+            path_cost = path_cost + first_second_path_cost
+            pointer = pointer+1
+        return path_cost
+    else:
+        return path_cost
+        
+        
+def find_a_star_value(h_value , pc):
+    a_star = h_value + pc
+    return a_star        
+        
+def find_state_id():
+    state_id = len(list(G.nodes))+1
+    return state_id
+
+def initial_state_node(start_city):
+    visited_list = update_visited(1, start_city ,start_city)
+    pc = find_path_cost(visited_list)
+    h_value = find_heuristic(start_city,start_city,visited_list)
+    a_star = find_a_star_value(h_value , pc)
+    state_id = find_state_id()
     feed_dict = {'h': h_value,
                  'pc': pc,
-                 'visited':visited_list
+                 'a_star':a_star,
+                 'visited':visited_list,
+                 'state_id': state_id
                 }
-    G.add_node(0 ,state_info = feed_dict)
-    print(h_value , pc , visited_list)
+    G.add_node(state_id, state_info = feed_dict)
 
+
+#Getting node data 
+#G.node[city]['state_info']['h']
 
 initial_state_node(0)
+#pass in a node and the ciy you want to add
+def create_state(current_state_id,city):
+    current_city = G.node[current_state_id]['state_info']['visited'][-1]
+    state_id = find_state_id()
+    visited_list = update_visited(current_state_id,current_city ,city)
+    h_value = find_heuristic(current_city,city,visited_list)
+    pc = find_path_cost(visited_list)
+    a_star = find_a_star_value(h_value,pc)
+    
+    feed_dict = {'h':h_value,
+                 'pc':pc,
+                 'a_star':a_star,
+                 'visited':visited_list,
+                 'state_id':state_id
+                }
+    G.add_node(state_id , state_info = feed_dict)
+    G.add_edge(current_state_id, state_id)
+
+
+create_state(1,1) 
+    
+    
+    
+    
+    
+    
+    
     
     
         
